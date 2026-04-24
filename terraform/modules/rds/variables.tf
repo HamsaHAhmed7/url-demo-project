@@ -1,0 +1,5 @@
+variable "project" {}
+variable "vpc_id" {}
+variable "subnet_ids" { type = list(string) }
+variable "ecs_security_group" {}
+variable "db_password" { sensitive = true }
