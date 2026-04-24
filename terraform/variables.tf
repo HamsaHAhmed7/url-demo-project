@@ -2,6 +2,11 @@ variable "aws_region" {
   default = "eu-west-2"
 }
 
+variable "environment" {
+  description = "Deployment environment"
+  default     = "production"
+}
+
 variable "project" {
   default = "project-demo"
 }

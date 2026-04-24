@@ -66,6 +66,7 @@ module "iam" {
 module "ecs" {
   source                  = "./modules/ecs"
   project                 = var.project
+  environment             = var.environment
   vpc_id                  = module.vpc.vpc_id
   subnet_ids              = module.vpc.private_subnet_ids
   api_image               = "${module.ecr.api_repository_url}:latest"
