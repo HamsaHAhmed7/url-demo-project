@@ -1,4 +1,5 @@
 variable "project" {}
+variable "environment" { default = "production" }
 variable "vpc_id" {}
 variable "subnet_ids" { type = list(string) }
 variable "aws_region" { default = "eu-west-2" }
