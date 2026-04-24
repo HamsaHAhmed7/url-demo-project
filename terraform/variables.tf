@@ -24,5 +24,15 @@ variable "github_org" {
 
 variable "github_repo" {
   description = "GitHub repo name for OIDC trust"
-  default     = "project-demo"
+  default     = "url-demo-project"
+}
+
+variable "root_domain" {
+  description = "Root Route53 domain (must already exist in your AWS account)"
+  default     = "hamsa-ahmed.co.uk"
+}
+
+variable "subdomain" {
+  description = "Full subdomain for the URL shortener"
+  default     = "url.hamsa-ahmed.co.uk"
 }

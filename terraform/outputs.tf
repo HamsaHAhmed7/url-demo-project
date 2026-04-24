@@ -2,6 +2,10 @@ output "alb_dns_name" {
   value = module.alb.alb_dns_name
 }
 
+output "app_url" {
+  value = "https://${var.subdomain}"
+}
+
 output "api_ecr_url" {
   value = module.ecr.api_repository_url
 }

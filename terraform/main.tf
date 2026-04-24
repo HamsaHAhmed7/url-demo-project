@@ -14,6 +14,28 @@ module "sqs" {
   project = var.project
 }
 
+module "acm" {
+  source      = "./modules/acm"
+  root_domain = var.root_domain
+  subdomain   = var.subdomain
+}
+
+module "alb" {
+  source            = "./modules/alb"
+  project           = var.project
+  vpc_id            = module.vpc.vpc_id
+  public_subnet_ids = module.vpc.public_subnet_ids
+  certificate_arn   = module.acm.certificate_arn
+}
+
+module "dns" {
+  source       = "./modules/dns"
+  zone_id      = module.acm.zone_id
+  subdomain    = var.subdomain
+  alb_dns_name = module.alb.alb_dns_name
+  alb_zone_id  = module.alb.alb_zone_id
+}
+
 module "rds" {
   source             = "./modules/rds"
   project            = var.project
@@ -31,51 +53,44 @@ module "elasticache" {
   ecs_security_group = module.ecs.task_security_group_id
 }
 
-module "alb" {
-  source     = "./modules/alb"
-  project    = var.project
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnet_ids
-}
-
 module "iam" {
-  source       = "./modules/iam"
-  project      = var.project
-  aws_region   = var.aws_region
-  sqs_arn      = module.sqs.queue_arn
-  ecr_arns     = module.ecr.repository_arns
-  github_org   = var.github_org
-  github_repo  = var.github_repo
+  source      = "./modules/iam"
+  project     = var.project
+  aws_region  = var.aws_region
+  sqs_arn     = module.sqs.queue_arn
+  ecr_arns    = module.ecr.repository_arns
+  github_org  = var.github_org
+  github_repo = var.github_repo
 }
 
 module "ecs" {
-  source              = "./modules/ecs"
-  project             = var.project
-  vpc_id              = module.vpc.vpc_id
-  subnet_ids          = module.vpc.private_subnet_ids
-  api_image           = "${module.ecr.api_repository_url}:latest"
-  worker_image        = "${module.ecr.worker_repository_url}:latest"
-  dashboard_image     = "${module.ecr.dashboard_repository_url}:latest"
+  source                  = "./modules/ecs"
+  project                 = var.project
+  vpc_id                  = module.vpc.vpc_id
+  subnet_ids              = module.vpc.private_subnet_ids
+  api_image               = "${module.ecr.api_repository_url}:latest"
+  worker_image            = "${module.ecr.worker_repository_url}:latest"
+  dashboard_image         = "${module.ecr.dashboard_repository_url}:latest"
   api_task_role_arn       = module.iam.api_task_role_arn
   worker_task_role_arn    = module.iam.worker_task_role_arn
   dashboard_task_role_arn = module.iam.dashboard_task_role_arn
   execution_role_arn      = module.iam.ecs_execution_role_arn
-  db_url              = module.rds.connection_url
-  redis_url           = module.elasticache.redis_url
-  sqs_queue_url       = module.sqs.queue_url
-  alb_api_tg_arn       = module.alb.api_target_group_arn
-  alb_dashboard_tg_arn = module.alb.dashboard_target_group_arn
-  alb_security_group_id = module.alb.alb_security_group_id
+  db_url                  = module.rds.connection_url
+  redis_url               = module.elasticache.redis_url
+  sqs_queue_url           = module.sqs.queue_url
+  alb_api_tg_arn          = module.alb.api_target_group_arn
+  alb_dashboard_tg_arn    = module.alb.dashboard_target_group_arn
+  alb_security_group_id   = module.alb.alb_security_group_id
 }
 
 module "monitoring" {
-  source       = "./modules/monitoring"
-  project      = var.project
-  aws_region   = var.aws_region
-  alert_email  = var.alert_email
-  alb_arn      = module.alb.alb_arn
+  source         = "./modules/monitoring"
+  project        = var.project
+  aws_region     = var.aws_region
+  alert_email    = var.alert_email
+  alb_arn        = module.alb.alb_arn
   sqs_queue_name = module.sqs.queue_name
-  rds_id       = module.rds.instance_id
-  redis_id     = module.elasticache.cluster_id
-  ecs_cluster  = module.ecs.cluster_name
+  rds_id         = module.rds.instance_id
+  redis_id       = module.elasticache.cluster_id
+  ecs_cluster    = module.ecs.cluster_name
 }
