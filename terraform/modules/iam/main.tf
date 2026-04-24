@@ -201,9 +201,14 @@ resource "aws_iam_role_policy" "github_actions" {
         Resource = ["arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/project-demo-tf-locks"]
       },
       {
-        Effect   = "Allow"
-        Action   = ["iam:PassRole"]
-        Resource = ["*"]
+        Effect = "Allow"
+        Action = ["iam:PassRole"]
+        Resource = [
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project}-api-task-role",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project}-worker-task-role",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project}-dashboard-task-role",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project}-ecs-execution-role"
+        ]
       }
     ]
   })
