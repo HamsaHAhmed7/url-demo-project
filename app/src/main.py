@@ -185,8 +185,10 @@ async def shorten(req: Request):
         raise HTTPException(400, "url required")
     short = hashlib.sha256(url.encode()).hexdigest()[:8]
     put_mapping(short, url)
-    base_url = os.environ.get("BASE_URL", str(req.base_url).rstrip("/"))
-    return {"short": short, "url": url, "short_url": f"{base_url}/{short}"}
+    base = os.environ.get("BASE_URL", str(req.base_url).rstrip("/"))
+    if base.startswith("http://") and req.headers.get("x-forwarded-proto") == "https":
+        base = "https://" + base[len("http://"):]
+    return {"short": short, "url": url, "short_url": f"{base}/{short}"}
 
 
 @app.get("/stats/{short_id}")
