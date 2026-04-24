@@ -119,6 +119,7 @@ HTML = """<!DOCTYPE html>
       result.style.display = 'none';
 
       if (!url) { showError('Please enter a URL.'); return; }
+      if (!/^https?:\/\//i.test(url)) { showError('Please include https:// in your URL.'); return; }
 
       btn.disabled = true;
       btn.textContent = 'Shortening...';
@@ -183,6 +184,8 @@ async def shorten(req: Request):
     url = body.get("url")
     if not url:
         raise HTTPException(400, "url required")
+    if not url.startswith(("http://", "https://")):
+        url = "https://" + url
     short = hashlib.sha256(url.encode()).hexdigest()[:8]
     put_mapping(short, url)
     base = os.environ.get("BASE_URL", str(req.base_url).rstrip("/"))
