@@ -7,5 +7,5 @@ __pycache__/
 .plan
 terraform.tfstate*
 terraform/.terraform/
-terraform/.terraform.lock.hcl
+# .terraform.lock.hcl is intentionally tracked to pin provider versions
 *.tfvars

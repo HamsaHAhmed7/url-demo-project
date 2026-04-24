@@ -19,7 +19,7 @@ resource "aws_cloudwatch_metric_alarm" "api_latency" {
   metric_name         = "TargetResponseTime"
   namespace           = "AWS/ApplicationELB"
   period              = 60
-  statistic           = "p99"
+  extended_statistic  = "p99"
   threshold           = 1
   alarm_actions       = [aws_sns_topic.alerts.arn]
   dimensions = {

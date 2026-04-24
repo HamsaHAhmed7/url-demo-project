@@ -1,4 +1,5 @@
 aws_region  = "eu-west-2"
+# S3 bucket name in backend.tf uses account ID suffix for global uniqueness
 project     = "url-demo-project"
 environment = "production"
 db_password = "change-me-before-applying"
